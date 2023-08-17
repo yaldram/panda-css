@@ -1,0 +1,17 @@
+@layer utilities {
+  .text_red\.500 {
+    color: var(--colors-red-500)
+    }
+
+  .text_blue\.500 {
+    color: var(--colors-blue-500)
+    }
+
+  .text_green\.500 {
+    color: var(--colors-green-500)
+    }
+
+  .text_orange\.500 {
+    color: var(--colors-orange-500)
+    }
+}

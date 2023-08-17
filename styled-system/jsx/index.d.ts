@@ -1,4 +1,6 @@
 /* eslint-disable */
+export * from './factory'
+export * from './is-valid-prop'
 export * from './box'
 export * from './flex'
 export * from './stack'
@@ -17,3 +19,4 @@ export * from './wrap'
 export * from './container'
 export * from './divider'
 export * from './float'
+export type { HTMLStyledProps } from '../types/jsx'

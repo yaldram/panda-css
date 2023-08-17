@@ -51,10 +51,11 @@ export type CompositionStyleObject<Property extends string> = Nested<{
 /* -----------------------------------------------------------------------------
  * Jsx style props
  * -----------------------------------------------------------------------------*/
-type WithCss = { css?: SystemStyleObject }
-type StyleProps = SystemProperties & MinimalNested<SystemStyleObject>
 
-export type JsxStyleProps = StyleProps & WithCss
+export type JsxStyleProps = SystemProperties &
+  MinimalNested<SystemStyleObject> & {
+    css?: SystemStyleObject
+  }
 
 export type Assign<T, U> = Omit<T, keyof U> & U
 

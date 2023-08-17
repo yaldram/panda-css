@@ -3,6 +3,22 @@ function isObject(value) {
   return typeof value === "object" && value != null && !Array.isArray(value);
 }
 
+// src/astish.ts
+var newRule = /(?:([\u0080-\uFFFF\w-%@]+) *:? *([^{;]+?);|([^;}{]*?) *{)|(}\s*)/g;
+var ruleClean = /\/\*[^]*?\*\/|\s\s+|\n/g;
+var astish = (val, tree = [{}]) => {
+  const block = newRule.exec((val ?? "").replace(ruleClean, ""));
+  if (!block)
+    return tree[0];
+  if (block[4])
+    tree.shift();
+  else if (block[3])
+    tree.unshift(tree[0][block[3]] = tree[0][block[3]] || {});
+  else
+    tree[0][block[1]] = block[2];
+  return astish(val, tree);
+};
+
 // src/compact.ts
 function compact(value) {
   return Object.fromEntries(Object.entries(value ?? {}).filter(([_, value2]) => value2 !== void 0));
@@ -209,52 +225,15 @@ var hypenateProperty = memo((property) => {
   return property.replace(wordRegex, "-$1").replace(msRegex, "-ms-").toLowerCase();
 });
 
-// src/slot.ts
-var assign = (obj, path, value) => {
-  const last = path.pop();
-  const target = path.reduce((acc, key) => {
-    if (acc[key] == null)
-      acc[key] = {};
-    return acc[key];
-  }, obj);
-  if (last != null)
-    target[last] = value;
-};
-var getSlotRecipes = (recipe) => {
-  const parts = recipe.slots.map((slot) => [
-    slot,
-    // setup base recipe
-    {
-      // create class-base on BEM
-      className: [recipe.className ?? "", slot].join("__"),
-      base: {},
-      variants: {},
-      defaultVariants: recipe.defaultVariants ?? {},
-      compoundVariants: []
-    }
-  ]).map(([slot, cva]) => {
-    const base = recipe.base[slot];
-    if (base)
-      cva.base = base;
-    walkObject(
-      recipe.variants ?? {},
-      (variant, path) => {
-        if (!variant[slot])
-          return;
-        assign(cva, ["variants", ...path], variant[slot]);
-      },
-      {
-        stop: (_value, path) => path.includes(slot)
-      }
-    );
-    if (recipe.compoundVariants) {
-      cva.compoundVariants = getSlotCompoundVariant(recipe.compoundVariants, slot);
-    }
-    return [slot, cva];
-  });
-  return Object.fromEntries(parts);
-};
-var getSlotCompoundVariant = (compoundVariants, slotName) => compoundVariants.filter((compoundVariant) => compoundVariant.css[slotName]).map((compoundVariant) => ({ ...compoundVariant, css: compoundVariant.css[slotName] }));
+// src/normalize-html.ts
+var htmlProps = ["htmlSize", "htmlTranslate", "htmlWidth", "htmlHeight"];
+function convert(key) {
+  return htmlProps.includes(key) ? key.replace("html", "").toLowerCase() : key;
+}
+function normalizeHTMLProps(props) {
+  return Object.fromEntries(Object.entries(props).map(([key, value]) => [convert(key), value]));
+}
+normalizeHTMLProps.keys = htmlProps;
 
 // src/split-props.ts
 function splitProps(props, ...keys) {
@@ -275,18 +254,17 @@ function splitProps(props, ...keys) {
   return keys.map(fn).concat(split(dKeys));
 }
 export {
+  astish,
   compact,
   createCss,
   createMergeCss,
   filterBaseConditions,
-  getSlotCompoundVariant,
-  getSlotRecipes,
   hypenateProperty,
   isBaseCondition,
   isObject,
   mapObject,
-  memo,
   mergeProps,
+  normalizeHTMLProps,
   splitProps,
   toHash,
   walkObject,
@@ -294,13 +272,10 @@ export {
 };
 
 
-
-
-
-export function __spreadValues(a, b) {
+export function __spreadValues(a, b){
   return { ...a, ...b }
 }
 
-export function __objRest(source, exclude) {
+export function __objRest(source, exclude){
   return Object.fromEntries(Object.entries(source).filter(([key]) => !exclude.includes(key)))
 }
