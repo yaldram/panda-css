@@ -6,7 +6,12 @@ export function App() {
     <Flex>
       <Flex direction="column" flex={1} gap="7" p="5">
         <Flex gap="7">
-          <Button size="xs" colorScheme="green">
+          <Button
+            m="10"
+            size="xs"
+            colorScheme="green"
+            _hover={{ bg: "red.800" }}
+          >
             Click Me
           </Button>
           <Button size="xs" colorScheme="orange">

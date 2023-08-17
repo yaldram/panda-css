@@ -1,5 +1,6 @@
-import { RecipeVariantProps, cva, cx } from "../styled-system/css";
+import { cva } from "../styled-system/css";
 import { ButtonSizesVariantProps, buttonSizes } from "../styled-system/recipes";
+import { styled } from "../styled-system/jsx";
 
 const buttonWithVariant = cva({
   base: {
@@ -227,19 +228,19 @@ const buttonWithVariant = cva({
   },
 });
 
-export type ButtonProps = RecipeVariantProps<typeof buttonWithVariant> &
-  ButtonSizesVariantProps &
-  React.ComponentPropsWithoutRef<"button">;
+const StyledButton = styled("button", buttonWithVariant);
+
+export type ButtonProps = ButtonSizesVariantProps &
+  React.ComponentProps<typeof StyledButton>;
 
 export function Button(props: ButtonProps) {
   const { colorScheme, variant, size, ...delegated } = props;
 
   return (
-    <button
-      className={cx(
-        buttonSizes({ size }),
-        buttonWithVariant({ colorScheme, variant })
-      )}
+    <StyledButton
+      className={buttonSizes({ size })}
+      colorScheme={colorScheme}
+      variant={variant}
       {...delegated}
     />
   );
